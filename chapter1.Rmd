@@ -1,4 +1,10 @@
 
 # About the project
 
-*Write a short description about the course and add a link to your github repository here. This is an R markdown (.Rmd) file so you can use R markdown syntax. See the 'Useful links' page in the mooc area (chapter 1) for instructions.*
+1. Tools and methods for open and reproducible research R, RStudio, Rmarkdown, GitHub
+2. Regression and model validation
+3. Logistic regression
+4. Clustering and classification, Discriminant analysis (DA), K-means clustering (KMC)
+5. Dimensionality reduction techniques, Principal component analysis (PCA), Multiple Correspondence analysis (MCA)
+
+https://github.com/nimirum/IODS-project
