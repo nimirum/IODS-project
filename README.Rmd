@@ -1,3 +1,24 @@
 # Introduction to Open Data Science, Fall 2017
 
 https://nimirum.github.io/IODS-project/
+
+At the moment index.html is not knitted because I can't get RMarkdown work in RStudio
+
+```
+* installing *source* package 'rmarkdown' ...
+** package 'rmarkdown' successfully unpacked and MD5 sums checked
+** R
+** inst
+** preparing package for lazy loading
+Error in loadNamespace(i, c(lib.loc, .libPaths()), versionCheck = vI[[i]]) : 
+  there is no package called 'backports'
+ERROR: lazy loading failed for package 'rmarkdown'
+* removing 'C:/Users/milla/Documents/R/win-library/3.2/rmarkdown'
+Warning in install.packages :
+  running command '"C:/PROGRA~1/R/R-32~1.3/bin/x64/R" CMD INSTALL -l "C:\Users\milla\Documents\R\win-library\3.2" C:\Users\milla\AppData\Local\Temp\Rtmp6hW4L9/downloaded_packages/rmarkdown_1.6.tar.gz' had status 1
+Warning in install.packages :
+  installation of package ‘rmarkdown’ had non-zero exit status
+
+The downloaded source packages are in
+	‘C:\Users\milla\AppData\Local\Temp\Rtmp6hW4L9\downloaded_packages’
+```
