@@ -1,7 +1,67 @@
-# Insert chapter 2 title here
+# Week 2: Regression and Model Validation
 
-*Describe the work you have done this week and summarize your learning.*
+This week's topic was about linear regression and its extended form, the multiple linear regression. 
 
-- Describe your work and results clearly. 
-- Assume the reader has an introductory course level understanding of writing and reading R code as well as statistical methods
-- Assume the reader has no previous knowledge of your data or the more advanced methods you are using  
+I installed ggplot2 and GGally for data anylsis. I read the students2014 data into R.
+
+```{r warning=FALSE}
+library(ggplot2)
+library(GGally)
+lrn14 <- read.csv('data/learning2014.txt',sep=',')
+```
+
+The data is [a study](http://www.helsinki.fi/~kvehkala/JYTmooc/JYTOPKYS2-meta.txt) from a course "Johdatus yhteiskuntatilastotieteeseen, syksy 2014" about learning and teaching statistics.
+It has 7 different variables
+
+1. Age      (in years) derived from the date of birth
+2. Gender:   Male = 1 or  Female = 2
+3. Attitude is a global attitude towards statistics
+4. Deep is an combination of feelings with statisics
+5. Stra is an combination of learning strategics
+6. Surf is an combination of which things to concentrate on studies
+7. Points is total points (max of all)
+
+Data structure and first 5 rows of it.
+
+```{r}
+dim(lrn14)
+str(lrn14)
+head(lrn14, n=5)
+```
+
+A graphical overview of the data 
+
+```{r}
+ggpairs(lrn14, mapping = aes(col=gender, alpha=0.3), lower = list(combo = wrap("facethist", bins = 20)))
+
+```
+
+There seems to be correlation with points and attitude. Stra and deep values seems to have some shape of normal distribution. The surveys participants are mostly close to age 20 and total points are fairly evenly distributed.
+
+I choose three variables (attitude, stra, surf) as explanatory variables to fit a regression model where exam points is the target (dependent) variable. 
+
+```{r}
+model <- lm(points ~ attitude + stra + surf, data = lrn14)
+summary(model)
+
+```
+
+Only attitude seems to correlate (***) with points so I removed stra and surf
+
+```{r}
+model <- lm(points ~ attitude, data = lrn14)
+summary(model)
+
+```
+
+Multiple R-squared of the model is approxrimately 0,19. The best value is 1, therefore the model explains 19% of the exam points is due to attitude. 
+
+Diagnostic plots: Residuals vs Fitted values, Normal QQ-plot and Residuals vs Leverage.
+
+```{r}
+par(mfrow = c(2,2))
+plot(model, which = c(1,2,5))
+```
+
+It seems that the only plot that fits the data is Normal QQ.
+

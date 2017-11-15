@@ -2,9 +2,10 @@
 ### 15.11.2017
 ### Exercise 2
 
+## Data wrangling
+
 # read csv data
 lrn14 <- read.csv('data/JYTOPKYS3-data.txt',sep='\t')
-data <- data.frame()
 
 #dimensions
 dim(lrn14)
@@ -53,6 +54,27 @@ lrn14 <- lrn14[lrn14$points > 0,]
 dim(lrn14)
 head(lrn14)
 
-write.csv(lrn14, 'learning2014.csv', row.names=F)
-testRead <- read.csv('learning2014.csv')
+write.csv(lrn14, 'data/learning2014.csv', row.names=F)
+testRead <- read.csv('data/learning2014.csv')
 head(testRead)
+
+
+## Analysis
+
+library(ggplot2)
+library(GGally)
+
+# A study from a cource "Johdatus yhteiskuntatilastotieteeseen, syksy 2014" about learning and teaching statistics
+# Age      Age (in years) derived from the date of birth
+# Gender   Male = 1  Female = 2
+# Attitude is the global attitude toward statistics
+# Deep is an combination of feelings with statisics
+# Stra is an combination of learning strategics
+# Surf is an combination of which things to concentrate on studies
+
+# read csv/txt data
+lrn14 <- read.csv('data/learning2014.txt',sep=',')
+head(lrn14)
+dim(lrn14)
+
+
