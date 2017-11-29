@@ -82,7 +82,7 @@ OR <- coef(model) %>% exp
 CI <- confint(model) %>% exp
 cbind(OR, CI)
 ```
-In here we can see that people with alcohol use are more likely to have high course failure count high chance of having absences. In odds ratio model the high alcohol students are more probably males than females. These results support my hypothesis.
+In here we can see that people with alcohol use are more likely to have high course failure count and high chance of having absences. In odds ratio model the high alcohol students are more probably males than females. These results support my hypothesis.
 
 ### Prediction
 

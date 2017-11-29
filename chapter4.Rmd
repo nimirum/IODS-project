@@ -1,0 +1,174 @@
+# Week 4: Clustering and classification
+
+This week's topic was about exploring statistical data
+
+### The data
+
+I load the Boston data from MASS libray into R. 
+
+```{r warning=FALSE, message=FALSE}
+library(dplyr);library(tidyr);library(ggplot2)
+library(boot);library(MASS);library(corrplot)
+library(plotly)
+#library(tidyverse)
+
+#Load the Boston data from the MASS package. 
+data("Boston")
+
+```
+
+[The Boston data set](https://stat.ethz.ch/R-manual/R-devel/library/MASS/html/Boston.html) contains information about factors effecting housing values in suburban areas of Boston. The data includes e.g crimerate (crim), full value property tax rate per 10000$ (tax) and pupil- teacher ratio (pratio). 
+
+```{r}
+#Explore the structure and the dimensions of the data
+str(Boston)
+summary(Boston)
+```
+
+From the summary, we can see that all the variables in this data frame are numeric.
+
+```{r}
+# The correlation matrix 
+cor_matrix<-cor(Boston) %>% round(digits = 2)
+
+# Plotting the correlation matrix
+corrplot(cor_matrix, method="circle", type="upper", cl.pos = "b",tl.pos = "d",tl.cex = 0.6)
+```
+
+Above is the correlation chart of the values. In there it's visible that rad (index of accessibility to radial highways) correlates positively to dis (weighted mean of distances to five Boston employment centres) and lstat(lower status of the population (percent)) correlates positively with medv (median value of owner-occupied homes in $1000s).
+
+The data must be scaled beore doing any further analysis from it.
+```{r}
+boston_scaled <- scale(Boston)
+boston_scaled <- as.data.frame(boston_scaled)
+```
+
+Crime rates are categorized to four categories
+```{r}
+# create a quantile vector of crim and print it
+bins <- quantile(boston_scaled$crim)
+# create a categorical variable 'crime'
+crime <- cut(boston_scaled$crim, breaks = bins, include.lowest = TRUE, label=c("low", "med_low","med_high","high"))
+# save it
+boston_scaled <- dplyr::select(boston_scaled, -crim)
+boston_scaled <- data.frame(boston_scaled, crime)
+
+```
+
+Randomly pick training and testing data
+```{r}
+# choose randomly 80% of the rows
+n <- nrow(boston_scaled)
+ind <- sample(n,  size = n * 0.8)
+
+# create train and test set
+train <- boston_scaled[ind,]
+test <- boston_scaled[-ind,]
+
+# save the correct classes from test data
+correct_classes <- test$crime
+# remove the crime variable from test data
+test <- dplyr::select(test, -crime)
+
+```
+
+Linear discriminant analysis, in which I use categorical crime rate as the target variable and all the other variables as predictor variables. 
+
+```{r}
+lda.fit <- lda(crime ~., data = train)
+
+# print the lda.fit object
+lda.fit
+```
+
+Plotting LDA results with a biplot
+
+```{r}
+# the function for lda biplot arrows
+lda.arrows <- function(x, myscale = 1, arrow_heads = 0.1, color = "red", tex = 0.75, choices = c(1,2)){
+  heads <- coef(x)
+  arrows(x0 = 0, y0 = 0, 
+         x1 = myscale * heads[,choices[1]], 
+         y1 = myscale * heads[,choices[2]], col=color, length = arrow_heads)
+  text(myscale * heads[,choices], labels = row.names(heads), 
+       cex = tex, col=color, pos=3)
+}
+
+# target classes as numeric
+classes <- as.numeric(train$crime)
+
+# plot the lda results
+plot(lda.fit, dimen = 2, col = classes, pch = classes)
+lda.arrows(lda.fit, myscale = 2)
+```
+
+Calculate LDA predicting performance
+
+```{r}
+# predict classes with test data
+lda.pred <- predict(lda.fit, newdata = test)
+
+# cross tabulate the results
+table(correct = correct_classes, predicted = lda.pred$class)
+```
+
+Loading the Boston data again and preparing it for clustering
+
+```{r }
+data('Boston')
+Boston <- scale(Boston)
+dist_eu <- dist(Boston)
+summary(dist_eu)
+
+n <- nrow(boston_scaled)
+ind <- sample(n,  size = n * 0.8)
+train <- boston_scaled[ind,]
+test <- boston_scaled[-ind,]
+correct_classes <- test$crime
+test <- dplyr::select(test, -crime)
+```
+
+Clustering the data with 4 cluter centroids
+
+```{r}
+km <-kmeans(Boston, centers = 4)
+pairs(Boston, col = km$cluster)
+```
+
+Finding the optimal amount of clusters by calculating total of within cluster sum of squares (WCSS) for clusters between 1 to 10.
+
+```{r}
+# calculate WCSS
+set.seed(123)
+k_max <- 10
+twcss <- sapply(1:k_max, function(k){kmeans(Boston, k)$tot.withinss})
+
+# visualize the results
+qplot(x = 1:k_max, y = twcss, geom = 'line')
+```
+
+Optimal amount of cluster centroids seems to be 2 from the plot above. The best number of clusters is when the total WCSS drops radically.
+
+K-means clustering again but with 2 cluster centroids.
+
+```{r}
+km <-kmeans(Boston, centers = 2)
+pairs(Boston, col = km$cluster)
+```
+
+```{r warning=FALSE, message=FALSE}
+model_predictors <- dplyr::select(train, -crime)
+# check the dimensions
+dim(model_predictors)
+dim(lda.fit$scaling)
+# matrix multiplication
+matrix_product <- as.matrix(model_predictors) %*% lda.fit$scaling
+matrix_product <- as.data.frame(matrix_product)
+```
+
+3D plot with crime categories
+
+```{r warning=FALSE, message=FALSE}
+plot_ly(x = matrix_product$LD1, y = matrix_product$LD2, z = matrix_product$LD3, type= 'scatter3d', mode='markers', color=train$crime)
+
+```
