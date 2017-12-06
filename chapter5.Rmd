@@ -1,0 +1,81 @@
+# Week 5: Dimensionality reduction techniques
+
+### The data
+
+The data is from UNs Development programs Human Development Index (HDI) and Gender Inequality Index data frames. These two are combined together to be a data frame named "Human". More information about the data [UN development programs: HDI](http://hdr.undp.org/en/content/human-development-index-hdi). 
+
+```{r warning=FALSE, message=FALSE}
+# dependecies
+library(dplyr); library(tidyr); library(dplyr); library(ggplot2)
+library(stringr); library(FactoMineR); library(GGally); library(corrplot)
+
+```
+
+```{r }
+# download human data
+human <- read.csv("data/human.csv")
+str(human)
+dim(human)
+head(human)
+```
+The structure of the data shows the 9 variables. X is the row.names that are the names of the countries. 
+
+```{r }
+# visualize human data
+summary(human)
+plot(human, col="blue")
+```
+
+The summary of the variables shows the types of data they hold in. X is as described just a list of country names. Edu2FM is the ratio of secondary education and Labo.FM ratio of labour force participation. Life Exp shows the life expectancy in different nations how long on average people live approximately. Expected years of education (Edu.exp) shows that in minimum years people go to school.  
+
+```{r }
+human$GNI<- str_replace(human$GNI, pattern=",", replace ="") %>% as.numeric()
+human_ <- select(human, -X)
+
+cor(human_) %>% corrplot()
+```
+
+### Principal component analysis 
+
+```{r warning=FALSE, message=FALSE}
+#PCA on the not standardized human data.
+pca_human <- prcomp(human_)
+biplot(pca_human, choices = 1:2,cex=c(0.8,1),col = c("grey40", "deeppink2"))
+
+#PCA on standardized/scaled variables
+human_std <- scale(human_)
+pca_human <- prcomp(human_std)
+biplot(pca_human, choices = 1:2,cex=c(0.8,1),col = c("grey40", "deeppink2"))
+```
+
+Above here is the biplot of data frame after PCA. The frame has not been standardized yet, which is why it has a strange shape. PCA maximizes the variance between variables and therefore without standardizing they tend to pack tightly or show only observations of one variable clearly. Standardized data set variable means are scaled in the middle and the plot is much easier to read.
+
+### Multiple Correspondence Analysis
+
+A dataset "tea" from FactoMineR library. The data contains answers from poll on things related to tea time. 
+
+```{r ,warning=FALSE,}
+
+data(tea)
+str(tea)
+dim(tea)
+
+
+keep_columns<- c("Tea", "evening", "dinner", "lunch", "where")
+tea_time<- select(tea, one_of(keep_columns))
+
+gather(tea_time) %>% ggplot(aes(value)) + facet_wrap("key", scales = "free")  +geom_bar() +theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 8))
+
+```
+
+Multiple Correspondence Analysis with variables Tea, Evening, Dinner, Lunch and Where.
+
+```{r , warning=FALSE,}
+mca <- MCA(tea_time, graph = FALSE)
+summary(mca)
+plot(mca, invisible=c("ind"), habillage = "quali")
+
+```
+
+Three variables stand from the crowd: dinner, tea shop and green tea. They don't come close to the dimensions and seems correlate with each other. All the other variables gather around the origo, except lunch.
+

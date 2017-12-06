@@ -43,4 +43,30 @@ human <- inner_join(hd, gii, by = c("Country"), suffix = c(".hd", ".gii"))
 colnames(human)
 dim(human)
 
-write.csv(human, file="data/human.csv", row.names= FALSE)
+#write.csv(human, file="human.csv", row.names= FALSE)
+
+# Week 5 Data Wrangling
+# 6.12.2017
+
+colnames(human)
+
+human <- mutate(human, as.numeric(GNI))
+keep <- c("Country", "Edu2.FM", "Labo.FM", "Edu.Exp", "Life.Exp", "GNI", "Mat.Mor", "Ado.Birth", "Parli.F")
+human <- select(human, one_of(keep))
+
+complete.cases(human)
+human_ <- filter(human, complete.cases(human)== TRUE)
+
+human$Country
+last <- nrow(human_) - 7
+human_ <- human_[1:last, ]
+rownames(human_) <- human_$Country
+human_ <- human_[ ,2:ncol(human_)]
+
+dim(human_)
+human <- human_
+
+write.csv(human, file="human.csv", row.names= TRUE)
+human <- read.csv("human.csv", row.names=1)
+dim(human)
+head(human)

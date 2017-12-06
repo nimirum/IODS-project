@@ -37,7 +37,7 @@ corrplot(cor_matrix, method="circle", type="upper", cl.pos = "b",tl.pos = "d",tl
 
 Above is the correlation chart of the values. In there it's visible that rad (index of accessibility to radial highways) correlates positively to dis (weighted mean of distances to five Boston employment centres) and lstat(lower status of the population (percent)) correlates positively with medv (median value of owner-occupied homes in $1000s).
 
-The data must be scaled beore doing any further analysis from it.
+The data must be scaled before doing any further analysis from it.
 ```{r}
 boston_scaled <- scale(Boston)
 boston_scaled <- as.data.frame(boston_scaled)
@@ -55,7 +55,7 @@ boston_scaled <- data.frame(boston_scaled, crime)
 
 ```
 
-Randomly pick training and testing data
+Randomly pick training (80%) and testing (20%) data
 ```{r}
 # choose randomly 80% of the rows
 n <- nrow(boston_scaled)
